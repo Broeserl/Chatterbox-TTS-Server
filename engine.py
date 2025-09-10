@@ -133,10 +133,12 @@ def load_model() -> bool:
                 # see: https://github.com/resemble-ai/chatterbox/issues/85
                 map_location = torch.device(resolved_device_str)
                 torch_load_original = torch.load
+
                 def patched_torch_load(*args, **kwargs):
                     if "map_location" not in kwargs:
                         kwargs["map_location"] = map_location
                     return torch_load_original(*args, **kwargs)
+
                 torch.load = patched_torch_load
                 logger.info("Patched torch.load to use MPS map_location by default.")
             else:
@@ -226,6 +228,7 @@ def synthesize(
     exaggeration: float = 0.5,
     cfg_weight: float = 0.5,
     seed: int = 0,
+    language_id: str = "en",
 ) -> Tuple[Optional[torch.Tensor], Optional[int]]:
     """
     Synthesizes audio from text using the loaded TTS model.
@@ -267,8 +270,8 @@ def synthesize(
         # Call the core model's generate method
         wav_tensor = chatterbox_model.generate(
             text=text,
-            language_id="de",
-            # audio_prompt_path=audio_prompt_path,
+            audio_prompt_path=audio_prompt_path,
+            language_id=language_id,
             temperature=temperature,
             exaggeration=exaggeration,
             cfg_weight=cfg_weight,
