@@ -8,7 +8,7 @@ import torch
 from typing import Optional, Tuple
 from pathlib import Path
 
-from chatterbox.tts import ChatterboxTTS  # Main TTS engine class
+from chatterbox.mtl_tts import ChatterboxMultilingualTTS
 from chatterbox.models.s3gen.const import (
     S3GEN_SR,
 )  # Default sample rate from the engine
@@ -19,7 +19,7 @@ from config import config_manager
 logger = logging.getLogger(__name__)
 
 # --- Global Module Variables ---
-chatterbox_model: Optional[ChatterboxTTS] = None
+chatterbox_model: Optional[ChatterboxMultilingualTTS] = None
 MODEL_LOADED: bool = False
 model_device: Optional[str] = (
     None  # Stores the resolved device string ('cuda' or 'cpu')
@@ -129,6 +129,16 @@ def load_model() -> bool:
             if _test_mps_functionality():
                 resolved_device_str = "mps"
                 logger.info("MPS requested and functional. Using MPS.")
+                # Patch torch.load to default to MPS map_location
+                # see: https://github.com/resemble-ai/chatterbox/issues/85
+                map_location = torch.device(resolved_device_str)
+                torch_load_original = torch.load
+                def patched_torch_load(*args, **kwargs):
+                    if "map_location" not in kwargs:
+                        kwargs["map_location"] = map_location
+                    return torch_load_original(*args, **kwargs)
+                torch.load = patched_torch_load
+                logger.info("Patched torch.load to use MPS map_location by default.")
             else:
                 resolved_device_str = "cpu"
                 logger.warning(
@@ -168,8 +178,10 @@ def load_model() -> bool:
         )
         try:
             # Directly use from_pretrained. This will utilize the standard Hugging Face cache.
-            # The ChatterboxTTS.from_pretrained method handles downloading if the model is not in the cache.
-            chatterbox_model = ChatterboxTTS.from_pretrained(device=model_device)
+            # The ChatterboxMultilingualTTS.from_pretrained method handles downloading if the model is not in the cache.
+            chatterbox_model = ChatterboxMultilingualTTS.from_pretrained(
+                device=model_device
+            )
             # The actual repo ID used by from_pretrained is often internal to the library,
             # but logging the configured one provides user context.
             logger.info(
@@ -255,13 +267,14 @@ def synthesize(
         # Call the core model's generate method
         wav_tensor = chatterbox_model.generate(
             text=text,
-            audio_prompt_path=audio_prompt_path,
+            language_id="de",
+            # audio_prompt_path=audio_prompt_path,
             temperature=temperature,
             exaggeration=exaggeration,
             cfg_weight=cfg_weight,
         )
 
-        # The ChatterboxTTS.generate method already returns a CPU tensor.
+        # The ChatterboxMultilingualTTS.generate method already returns a CPU tensor.
         return wav_tensor, chatterbox_model.sr
 
     except Exception as e:

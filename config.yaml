@@ -11,7 +11,7 @@ server:
 model:
   repo_id: ResembleAI/chatterbox
 tts_engine:
-  device: cuda
+  device: mps
   predefined_voices_path: voices
   reference_audio_path: reference_audio
   default_voice_id: Emily.wav
@@ -30,12 +30,7 @@ audio_output:
   sample_rate: 24000
   max_reference_duration_sec: 30
 ui_state:
-  last_text: 'Are you tired of slow, unreliable connections? Upgrade today to Quantum
-    Fiber, the fastest internet in the galaxy! Experience seamless streaming, lag-free
-    gaming, and instant downloads. Call now and get your first three months half price!
-    Don''t wait, this offer won''t last forever!
-
-    '
+  last_text: Guten Tag, dies ist ein Test.
   last_voice_mode: predefined
   last_predefined_voice: Emily.wav
   last_reference_file: Gianna.wav
