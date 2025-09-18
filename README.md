@@ -247,59 +247,130 @@ The `requirements-rocm.txt` file works just like the NVIDIA one, but it points `
 
 ### **Option 4: Apple Silicon (MPS) Installation**
 
-For users with Apple Silicon Macs (M1, M2, M3, etc.).
+For users with Apple Silicon Macs (M1, M2, M3, etc.) - now with **automated installation script**!
 
 **Prerequisite:** Ensure you have macOS 12.3 or later for MPS support.
 
-**Step 1: Install PyTorch with MPS support first**
-```bash
-# Make sure your (venv) is active
-pip install --upgrade pip
-pip install torch torchvision torchaudio
+#### **🚀 Automated Installation (Recommended)**
+
+We provide a comprehensive installation script that handles all the complexity for you:
 ```
+bash
+# Make sure you're in the project directory
+chmod +x install-apple-silicon.sh
+./install-apple-silicon.sh
+``` 
 
-**Step 2: Configure the server to use MPS**
-Update your `config.yaml` to use MPS instead of CUDA:
-```bash
-# The server will create config.yaml on first run, or you can create it manually
-# Make sure the tts_engine device is set to 'mps'
-```
+**What the script does automatically:**
+- ✅ **Python Version Management**: Detects compatible Python versions (3.9-3.12) and warns about Python 3.13+ incompatibility
+- ✅ **Python 3.12 Auto-Install**: Automatically installs Python 3.12 via Homebrew if needed
+- ✅ **Homebrew Installation**: Installs Homebrew package manager if not present
+- ✅ **Virtual Environment Setup**: Creates and activates a dedicated virtual environment with compatible Python
+- ✅ **Dependency Resolution**: Handles the complex installation sequence to avoid conflicts
+- ✅ **MPS Verification**: Tests Apple Silicon MPS acceleration after installation
+- ✅ **System Compatibility Check**: Verifies macOS version and hardware requirements
 
-**Step 3: Install remaining dependencies**
-```bash
-# Install chatterbox-tts without its dependencies to avoid conflicts
-pip install --no-deps git+https://github.com/resemble-ai/chatterbox.git
+**The script handles these critical installation steps:**
+1. **Intelligent Python Detection**: Searches for Python 3.12 in Homebrew and system locations
+2. **Conflict-Free Installation**: Uses `--no-deps` flags to prevent dependency conflicts
+3. **Proper Installation Order**: Installs PyTorch first, then chatterbox without dependencies, then remaining packages
+4. **Version Pinning**: Installs specific compatible versions of critical packages
+5. **MPS Configuration**: Guides you to set up MPS device configuration
 
-# Install core server dependencies
-pip install fastapi 'uvicorn[standard]' librosa safetensors soundfile pydub audiotsm praat-parselmouth python-multipart requests aiofiles PyYAML watchdog unidecode inflect tqdm
+**Interactive Features:**
+- Prompts for Homebrew installation if missing
+- Offers to install Python 3.12 automatically
+- Detects and handles incompatible Python 3.13+ virtual environments
+- Provides clear next steps after installation
 
-# Install missing chatterbox dependencies
-pip install conformer==0.3.2 diffusers==0.29.0 resemble-perth==1.0.1 transformers==4.46.3
+#### **Manual Installation (Advanced Users)**
 
-# Install s3tokenizer without its problematic dependencies
-pip install --no-deps s3tokenizer
-
-# Install a compatible version of ONNX
-pip install onnx==1.16.0
-```
-
-**Step 4: Configure MPS device**
-Either edit `config.yaml` manually or let the server create it, then modify:
-```yaml
-tts_engine:
-  device: mps  # Changed from 'cuda' to 'mps'
-```
-
-**After installation, verify that PyTorch can see your GPU:**
-```bash
-python -c "import torch; print(f'PyTorch version: {torch.__version__}'); print(f'MPS available: {torch.backends.mps.is_available()}'); print(f'Device will use: {\"mps\" if torch.backends.mps.is_available() else \"cpu\"}')"
-```
-If `MPS available:` shows `True`, your setup is correct!
+If you prefer manual control or the automated script doesn't work for your setup:
 
 <details>
-<summary><strong>💡 Why This Process Is Different</strong></summary>
-Apple Silicon requires a specific installation sequence due to dependency conflicts between the pinned PyTorch versions in chatterbox-tts and the latest PyTorch versions that support MPS. By installing PyTorch first with MPS support, then carefully installing dependencies while avoiding version conflicts, we ensure MPS acceleration works properly. The server's automatic device detection will use MPS when configured and available.
+<summary><strong>Click to expand manual installation steps</strong></summary>
+
+**Step 1: Install PyTorch with MPS support first**
+```
+bash
+# Make sure your (venv) is active
+pip install --upgrade pip pip install torch torchvision torchaudio
+``` 
+
+**Step 2: Install chatterbox-tts without dependencies to avoid conflicts**
+```
+bash pip install --no-deps git+[https://github.com/resemble-ai/chatterbox.git](https://github.com/resemble-ai/chatterbox.git)
+``` 
+
+**Step 3: Install core server dependencies**
+```
+bash pip install fastapi 'uvicorn[standard]' librosa safetensors soundfile pydub audiotsm praat-parselmouth python-multipart requests aiofiles PyYAML watchdog unidecode inflect tqdm
+``` 
+
+**Step 4: Install missing chatterbox dependencies with pinned versions**
+```
+bash pip install conformer==0.3.2 diffusers==0.29.0 resemble-perth==1.0.1 transformers==4.46.3
+``` 
+
+**Step 5: Install s3tokenizer without its problematic dependencies**
+```
+bash pip install --no-deps s3tokenizer
+``` 
+
+**Step 6: Install a compatible version of ONNX**
+```
+bash pip install onnx==1.16.0
+``` 
+
 </details>
+
+#### **Post-Installation Configuration**
+
+After successful installation (automated or manual), configure MPS acceleration:
+
+**Manual configuration**
+Create or edit `config.yaml`:
+```
+yaml tts_engine: device: mps # Set to 'mps' for Apple Silicon acceleration
+``` 
+
+#### **Verify Installation**
+
+Test that everything is working correctly:
+```
+bash python -c " import torch print(f'PyTorch version: {torch.}') print(f'MPS available: {torch.backends.mps.is_available()}') print(f'MPS built: {torch.backends.mps.is_built()}') **version**
+if torch.backends.mps.is_available(): try: x = torch.tensor([1.0, 2.0, 3.0]).to('mps') y = x * 2 result = y.cpu() print(f'MPS test successful: {result.tolist()}') print('🎉 Apple Silicon MPS acceleration is ready!') except Exception as e: print(f'MPS test failed: {e}') else: print('MPS not available - check macOS version (need 12.3+)') "
+``` 
+
+If MPS is available and the test passes, your installation is ready!
+
+<details>
+<summary><strong>💡 Why Apple Silicon Installation Is Complex</strong></summary>
+
+Apple Silicon requires a specific installation sequence due to several factors:
+
+- **Python 3.13+ Incompatibility**: ONNX and other ML packages don't yet support Python 3.13+
+- **Dependency Conflicts**: PyTorch MPS support requires careful version management
+- **Installation Order**: PyTorch must be installed first to ensure MPS support is properly configured
+- **Package Conflicts**: Some dependencies have conflicting version requirements that need `--no-deps` workarounds
+
+Our automated script handles all these complexities, ensuring you get a working MPS-accelerated installation.
+
+</details>
+
+#### **Troubleshooting**
+
+**Python 3.13+ Issues**: 
+If you see ONNX installation failures, you likely have Python 3.13+. The automated script will detect this and help you install Python 3.12.
+
+**MPS Not Available**: 
+Ensure you have:
+- macOS 12.3 or later
+- Apple Silicon Mac (M1, M2, M3, etc.)
+- Updated to latest macOS version
+
+**Script Issues**:
+If the automated script fails, try the manual installation or check that you have internet connectivity for downloading dependencies.
 
 ---
 
