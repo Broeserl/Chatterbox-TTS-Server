@@ -19,6 +19,7 @@ This server is based on the architecture and UI of our [Dia-TTS-Server](https://
 [![ROCm Compatible](https://img.shields.io/badge/AMD_ROCm-Compatible-ED1C24?style=for-the-badge&logo=amd&logoColor=white)](https://rocm.docs.amd.com/)
 [![MPS Compatible](https://img.shields.io/badge/Apple_MPS-Compatible-000000?style=for-the-badge&logo=apple&logoColor=white)](https://developer.apple.com/metal/)
 [![API](https://img.shields.io/badge/OpenAI_Compatible_API-Ready-000000?style=for-the-badge&logo=openai&logoColor=white)](https://platform.openai.com/docs/api-reference)
+[![Multilingual](https://img.shields.io/badge/24_Languages-Supported-brightgreen?style=for-the-badge&logo=translate&logoColor=white)](#supported-languages)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/devnen/Chatterbox-TTS-Server/blob/main/Chatterbox_TTS_Colab_Demo.ipynb)
 
 <div align="center">
@@ -28,24 +29,25 @@ This server is based on the architecture and UI of our [Dia-TTS-Server](https://
 
 ---
 
-## 🗣️ Overview: Enhanced Chatterbox TTS Generation
+## 🗣️ Overview: Enhanced Multilingual Chatterbox TTS Generation
 
-The [Chatterbox TTS model by Resemble AI](https://github.com/resemble-ai/chatterbox) provides capabilities for generating high-quality speech. This project builds upon that foundation by providing a robust [FastAPI](https://fastapi.tiangolo.com/) server that makes Chatterbox significantly easier to use and integrate.
+The [Chatterbox TTS model by Resemble AI](https://github.com/resemble-ai/chatterbox) provides capabilities for generating high-quality speech in **24 different languages**. This project builds upon that foundation by providing a robust [FastAPI](https://fastapi.tiangolo.com/) server that makes Chatterbox significantly easier to use and integrate.
 
 **🚀 Want to try it instantly?** [Launch the live demo in Google Colab](https://colab.research.google.com/github/devnen/Chatterbox-TTS-Server/blob/main/Chatterbox_TTS_Colab_Demo.ipynb) - no installation needed!
 
 The server expects plain text input for synthesis and we solve the complexity of setting up and running the model by offering:
 
 *   A **modern Web UI** for easy experimentation, preset loading, reference audio management, and generation parameter tuning.
+*   **🌍 Multilingual Support:** Generate natural speech in **24 languages** including English, Spanish, French, German, Japanese, Chinese, Arabic, and many more.
 *   **Multi-Platform Acceleration:** Full support for **NVIDIA (CUDA)**, **AMD (ROCm)**, and **Apple Silicon (MPS)** GPUs, with an automatic fallback to **CPU**, ensuring you can run on any hardware.
 *   **Large Text Handling:** Intelligently splits long plain text inputs into manageable chunks based on sentence structure, processes them sequentially, and seamlessly concatenates the audio.
-*   **📚 Audiobook Generation:** Perfect for creating complete audiobooks - simply paste an entire book's text and the server automatically processes it into a single, seamless audio file with consistent voice quality throughout.
+*   **📚 Audiobook Generation:** Perfect for creating complete audiobooks in multiple languages - simply paste an entire book's text and the server automatically processes it into a single, seamless audio file with consistent voice quality throughout.
 *   **Predefined Voices:** Select from curated, ready-to-use synthetic voices for consistent and reliable output without cloning setup.
 *   **Voice Cloning:** Generate speech using a voice similar to an uploaded reference audio file.
 *   **Consistent Generation:** Achieve consistent voice output across multiple generations or text chunks by using the "Predefined Voices" or "Voice Cloning" modes, optionally combined with a fixed integer **Seed**.
 *   **Docker support** for easy, reproducible containerized deployment on any platform.
 
-This server is your gateway to leveraging Chatterbox's TTS capabilities seamlessly, with enhanced stability, voice consistency, and large text support for plain text inputs.
+This server is your gateway to leveraging Chatterbox's multilingual TTS capabilities seamlessly, with enhanced stability, voice consistency, and large text support for plain text inputs across 24 languages.
 
 ## ✨ Key Features of This Server
 
@@ -56,10 +58,14 @@ This server application enhances the underlying `chatterbox-tts` engine with the
 
 **🚀 Core Functionality:**
 
+*   **🌍 Multilingual Text-to-Speech:**
+    *   Supports **24 languages** out-of-the-box: Arabic, Danish, German, Greek, English, Spanish, Finnish, French, Hebrew, Hindi, Italian, Japanese, Korean, Malay, Dutch, Norwegian, Polish, Portuguese, Russian, Swedish, Swahili, Turkish, and Chinese.
+    *   Automatic language detection or manual language selection via API parameter.
+    *   High-quality native pronunciation and intonation for each supported language.
 *   **Large Text Processing (Chunking):**
     *   Automatically handles long plain text inputs by intelligently splitting them into smaller chunks based on sentence boundaries.
     *   Processes each chunk individually and seamlessly concatenates the resulting audio, overcoming potential generation limits of the TTS engine.
-    *   **Ideal for audiobook generation** - paste entire books and get professional-quality audiobooks with consistent narration.
+    *   **Ideal for multilingual audiobook generation** - paste entire books in any supported language and get professional-quality audiobooks with consistent narration.
     *   Configurable via UI toggle ("Split text into chunks") and chunk size slider.
 *   **Predefined Voices:**
     *   Allows usage of curated, ready-to-use synthetic voices stored in the `./voices` directory.
@@ -71,7 +77,7 @@ This server application enhances the underlying `chatterbox-tts` engine with the
 *   **Generation Seed:** Added `seed` parameter to UI and API for influencing generation results. Using a fixed integer seed *in combination with* Predefined Voices or Voice Cloning helps maintain consistency.
 *   **API Endpoint (`/tts`):**
     *   The primary API endpoint, offering fine-grained control over TTS generation.
-    *   Supports parameters for text, voice mode (predefined/clone), reference/predefined voice selection, chunking control (`split_text`, `chunk_size`), generation settings (temperature, exaggeration, CFG weight, seed, speed factor, language), and output format.
+    *   Supports parameters for text, voice mode (predefined/clone), reference/predefined voice selection, chunking control (`split_text`, `chunk_size`), generation settings (temperature, exaggeration, CFG weight, seed, speed factor, **language**), and output format.
 *   **UI Configuration Management:** Added UI section to view/edit `config.yaml` settings (server, model, paths) and save generation defaults.
 *   **Configuration System:** Uses `config.yaml` for all runtime configuration, managed via `config.py` (`YamlConfigManager`). If `config.yaml` is missing, it's created with default values from `config.py`.
 *   **Audio Post-Processing (Optional):** Includes utilities for silence trimming, internal silence reduction, and (if `parselmouth` is installed) unvoiced segment removal to improve audio quality. These are configurable.
@@ -81,42 +87,70 @@ This server application enhances the underlying `chatterbox-tts` engine with the
 
 *   **Performance:** Optimized for speed and efficient VRAM usage on GPU.
 *   **Web Interface:** Modern, responsive UI for plain text input, parameter adjustment, preset loading, reference/predefined audio management, and audio playback.
-*   **Model Loading:** Uses `ChatterboxTTS.from_pretrained()` for robust model loading from Hugging Face Hub, utilizing the standard HF cache.
+*   **Model Loading:** Uses `ChatterboxMultilingualTTS.from_pretrained()` for robust model loading from Hugging Face Hub, utilizing the standard HF cache.
 *   **Dependency Management:** Clear `requirements.txt`.
 *   **Utilities:** Comprehensive `utils.py` for audio processing, text handling, and file management.
+
+## 🌍 Supported Languages
+
+The Chatterbox Multilingual TTS model supports high-quality speech synthesis in **24 languages**:
+
+| Language Code | Language Name | Language Code | Language Name |
+|---------------|---------------|---------------|---------------|
+| `ar` | Arabic | `ms` | Malay |
+| `da` | Danish | `nl` | Dutch |
+| `de` | German | `no` | Norwegian |
+| `el` | Greek | `pl` | Polish |
+| `en` | English | `pt` | Portuguese |
+| `es` | Spanish | `ru` | Russian |
+| `fi` | Finnish | `sv` | Swedish |
+| `fr` | French | `sw` | Swahili |
+| `he` | Hebrew | `tr` | Turkish |
+| `hi` | Hindi | `zh` | Chinese |
+| `it` | Italian | `ja` | Japanese |
+| `ko` | Korean | | |
+
+**Usage Notes:**
+- **Default Language:** English (`en`) is used by default if no language is specified.
+- **API Usage:** Use the language code (e.g., `"language": "fr"` for French) in API requests.
+- **Web UI:** Select your desired language from the dropdown menu in the interface.
+- **Voice Cloning:** Works across all supported languages - clone a voice in one language and use it for synthesis in another.
 
 ## ✅ Features Summary
 
 *   **Core Chatterbox Capabilities (via [Resemble AI Chatterbox](https://github.com/resemble-ai/chatterbox)):**
-    *   🗣️ High-quality single-speaker voice synthesis from plain text.
-    *   🎤 Perform voice cloning using reference audio prompts.
+    *   🗣️ High-quality single-speaker voice synthesis from plain text in **24 languages**.
+    *   🎤 Perform voice cloning using reference audio prompts across multiple languages.
+    *   🌍 Native-quality pronunciation and intonation for each supported language.
 *   **Enhanced Server & API:**
     *   ⚡ Built with the high-performance **[FastAPI](https://fastapi.tiangolo.com/)** framework.
-    *   ⚙️ **Custom API Endpoint** (`/tts`) as the primary method for programmatic generation, exposing all key parameters.
+    *   ⚙️ **Custom API Endpoint** (`/tts`) as the primary method for programmatic generation, exposing all key parameters including language selection.
     *   📄 Interactive API documentation via Swagger UI (`/docs`).
     *   🩺 Health check endpoint (`/api/ui/initial-data` also serves as a comprehensive status check).
 *   **Advanced Generation Features:**
+    *   🌍 **24-Language Support:** Generate speech in Arabic, Chinese, French, German, Japanese, Spanish, and 18 other languages with native-quality pronunciation.
     *   📚 **Large Text Handling:** Intelligently splits long plain text inputs into chunks based on sentences, generates audio for each, and concatenates the results seamlessly. Configurable via `split_text` and `chunk_size`.
-    *   📖 **Audiobook Creation:** Perfect for generating complete audiobooks from full-length texts with consistent voice quality and automatic chapter handling.
+    *   📖 **Multilingual Audiobook Creation:** Perfect for generating complete audiobooks from full-length texts in any supported language with consistent voice quality and automatic chapter handling.
     *   🎤 **Predefined Voices:** Select from curated synthetic voices in the `./voices` directory.
-    *   ✨ **Voice Cloning:** Simple voice cloning using an uploaded reference audio file.
+    *   ✨ **Voice Cloning:** Simple voice cloning using an uploaded reference audio file that works across all supported languages.
     *   🌱 **Consistent Generation:** Use Predefined Voices or Voice Cloning modes, optionally with a fixed integer **Seed**, for consistent voice output.
     *   🔇 **Audio Post-Processing:** Optional automatic steps to trim silence, fix internal pauses, and remove long unvoiced segments/artifacts (configurable via `config.yaml`).
 *   **Intuitive Web User Interface:**
     *   🖱️ Modern, easy-to-use interface.
+    *   🌍 **Language Selection:** Easy dropdown to select from 24 supported languages.
     *   💡 **Presets:** Load example text and settings dynamically from `ui/presets.yaml`.
     *   🎤 **Reference/Predefined Audio Upload:** Easily upload `.wav`/`.mp3` files.
     *   🗣️ **Voice Mode Selection:** Choose between Predefined Voices or Voice Cloning.
-    *   🎛️ **Parameter Control:** Adjust generation settings (Temperature, Exaggeration, CFG Weight, Speed Factor, Seed, etc.) via sliders and inputs.
+    *   🎛️ **Parameter Control:** Adjust generation settings (Temperature, Exaggeration, CFG Weight, Speed Factor, Seed, Language, etc.) via sliders and inputs.
     *   💾 **Configuration Management:** View and save server settings (`config.yaml`) and default generation parameters directly in the UI.
-    *   💾 **Session Persistence:** Remembers your last used settings via `config.yaml`.
+    *   💾 **Session Persistence:** Remembers your last used settings including language selection via `config.yaml`.
     *   ✂️ **Chunking Controls:** Enable/disable text splitting and adjust approximate chunk size.
     *   ⚠️ **Warning Modals:** Optional warnings for chunking voice consistency and general generation quality.
     *   🌓 **Light/Dark Mode:** Toggle between themes with preference saved locally.
     *   🔊 **Audio Player:** Integrated waveform player ([WaveSurfer.js](https://wavesurfer.xyz/)) for generated audio with download option.
     *   ⏳ **Loading Indicator:** Shows status during generation.
 *   **Flexible & Efficient Model Handling:**
-    *   ☁️ Downloads models automatically from [Hugging Face Hub](https://huggingface.co/) using `ChatterboxTTS.from_pretrained()`.
+    *   ☁️ Downloads models automatically from [Hugging Face Hub](https://huggingface.co/) using `ChatterboxMultilingualTTS.from_pretrained()`.
     *   🔄 Easily specify model repository via `config.yaml`.
     *   📄 Optional `download_model.py` script available to pre-download specific model components to a local directory (this is separate from the main HF cache used at runtime).
 *   **Performance & Configuration:**
@@ -531,14 +565,16 @@ The primary endpoint for TTS generation is `/tts`, which offers detailed control
         *   `output_format` (string, "wav" or "opus", default "wav").
         *   `split_text` (boolean, default True): Whether to chunk long text.
         *   `chunk_size` (integer, default 120): Target characters per chunk.
-        *   `temperature`, `exaggeration`, `cfg_weight`, `seed`, `speed_factor`, `language`: Generation parameters overriding defaults.
+        *   `temperature`, `exaggeration`, `cfg_weight`, `seed`, `speed_factor`: Generation parameters overriding defaults.
+        *   `language` (string, optional): Language code for synthesis (e.g., "en", "fr", "de", "es", "ja", "zh"). Defaults to "en" if not specified. See [Supported Languages](#supported-languages) for full list.
     *   **Response:** Streaming audio (`audio/wav` or `audio/opus`).
-*   **`/v1/audio/speech` (POST):** OpenAI-compatible.
-    *   `input`: Text.
+*   **`/v1/audio/speech` (POST):** OpenAI-compatible endpoint with multilingual support.
+    *   `input`: Text to synthesize.
     *   `voice`: 'S1', 'S2', 'dialogue', 'predefined_voice_filename.wav', or 'reference_filename.wav'.
     *   `response_format`: 'opus' or 'wav'.
     *   `speed`: Playback speed factor (0.5-2.0).
-    *   `seed`: (Optional) Integer seed, -1 for random.    
+    *   `seed`: (Optional) Integer seed, -1 for random.
+    *   `language`: (Optional) Language code for synthesis (e.g., "en", "fr", "de"). Defaults to "en".
 *   **Helper Endpoints (mostly for UI):**
     *   `GET /api/ui/initial-data`: Fetches all initial configuration, file lists, and presets for the UI.
     *   `POST /save_settings`: Saves partial updates to `config.yaml`.
@@ -547,6 +583,7 @@ The primary endpoint for TTS generation is `/tts`, which offers detailed control
     *   `GET /get_predefined_voices`: Lists formatted voices from `voices/`.
     *   `POST /upload_reference`: Uploads reference audio files.
     *   `POST /upload_predefined_voice`: Uploads predefined voice files.
+
 # 🐳 Docker Installation
 
 Run Chatterbox TTS Server easily using Docker. The recommended method uses Docker Compose, which is pre-configured for different GPU types.
