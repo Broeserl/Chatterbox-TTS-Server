@@ -263,7 +263,7 @@ def synthesize(
             )
 
         logger.debug(
-            f"Synthesizing with params: audio_prompt='{audio_prompt_path}', temp={temperature}, "
+            f"Synthesizing with params: audio_prompt='{audio_prompt_path}', language_id={language_id}, temp={temperature}, "
             f"exag={exaggeration}, cfg_weight={cfg_weight}, seed_applied_globally_if_nonzero={seed}"
         )
 
